@@ -1,0 +1,56 @@
+inherit python3-wheel
+
+NAME="ansible"
+VERSION=2.7.9
+RELEASE=1
+CATEGORY="Admin"
+SUMMARY="System automation tool"
+DESCRIPTION="Ansible is an IT automation tool. It can configure systems, deploy
+software, and orchestrate more advanced IT tasks such as continuous deployments
+or zero downtime rolling updates."
+HOMEPAGE="https://ansible.com/"
+
+PATCH_URI="2.7.6-cygwin-ssh.patch"
+
+ARCH=noarch
+
+DIFF_EXCLUDES="build dist docs .pytest_cache results"
+
+PKG_NAMES="${NAME} ${NAME}-doc"
+ansible_REQUIRES="python3-cryptography python3-jmespath python3-paramiko python3-passlib sshpass"
+ansible_CONTENTS="
+	--exclude=html
+	etc/defaults/etc/ansible/
+	etc/p*/ansible.sh
+	usr/bin/ansible*
+	${PYTHON3_SITELIB#/}/ansible*
+	usr/share/doc/${NAME}
+	usr/share/man/man1/ansible*
+"
+ansible_doc_CATEGORY="Doc"
+ansible_doc_CONTENTS="usr/share/doc/${NAME}/html"
+# pycrypto is NOT required at runtime when cryptography is present
+BUILD_REQUIRES="${REQUIRES} python3-crypto python3-alabaster python3-sphinx"
+
+REQUIRES_EXCLUDE_FROM="*/ansible/modules/*/*.py:*/ansible/modules/*/*/*.py"
+
+src_compile() {
+	cd ${S}
+	python3_wheel_compile
+	cygmake webdocs PYTHON=${PYTHON3}
+}
+
+src_test() {
+	cd ${S}
+	make tests-py3 PYTHON=${PYTHON3}
+}
+
+src_install() {
+	cd ${S}
+	python3_wheel_install
+	insinto /etc/ansible
+	doins examples/ansible.cfg examples/hosts
+	make_etc_defaults /etc/ansible
+	dodoc docs/docsite/_build/html
+	doman docs/man/man1/*.1
+}

@@ -1,0 +1,57 @@
+ssh ControlMaster=auto does not work yet on Cygwin
+
+--- origsrc/ansible-2.7.6/examples/ansible.cfg	2019-01-17 12:39:42.000000000 -0600
++++ src/ansible-2.7.6/examples/ansible.cfg	2019-01-27 22:14:50.243398500 -0600
+@@ -371,7 +371,7 @@
+ # ssh arguments to use
+ # Leaving off ControlPersist will result in poor performance, so use
+ # paramiko on older platforms rather than removing it, -C controls compression use
+-#ssh_args = -C -o ControlMaster=auto -o ControlPersist=60s
++#ssh_args = -C -o ControlMaster=no -o ControlPersist=60s
+ 
+ # The base directory for the ControlPath sockets.
+ # This is the "%(directory)s" in the control_path option
+--- origsrc/ansible-2.7.6/lib/ansible/config/base.yml	2019-01-17 12:39:42.000000000 -0600
++++ src/ansible-2.7.6/lib/ansible/config/base.yml	2019-01-27 22:14:57.805898500 -0600
+@@ -86,7 +86,7 @@ ANSIBLE_PIPELINING:
+   yaml: {key: plugins.connection.pipelining}
+ ANSIBLE_SSH_ARGS:
+   # TODO: move to ssh plugin
+-  default: -C -o ControlMaster=auto -o ControlPersist=60s
++  default: -C -o ControlMaster=no -o ControlPersist=60s
+   description:
+     - If set, this will override the Ansible default ssh arguments.
+     - In particular, users may wish to raise the ControlPersist time to encourage performance.  A value of 30 minutes may be appropriate.
+--- origsrc/ansible-2.7.6/lib/ansible/executor/module_common.py	2019-01-17 12:39:42.000000000 -0600
++++ src/ansible-2.7.6/lib/ansible/executor/module_common.py	2019-01-27 22:15:08.087148500 -0600
+@@ -206,7 +206,7 @@ def _ansiballz_main():
+         # Part of the verbose output will tell you where on the remote machine the
+         # module was written to::
+         #   [...]
+-        #   <host1> SSH: EXEC ssh -C -q -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o
++        #   <host1> SSH: EXEC ssh -C -q -o ControlMaster=no -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o
+         #   PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o ConnectTimeout=10 -o
+         #   ControlPath=/home/badger/.ansible/cp/ansible-ssh-%%h-%%p-%%r -tt rhel7 '/bin/sh -c '"'"'LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
+         #   LC_MESSAGES=en_US.UTF-8 /usr/bin/python /home/badger/.ansible/tmp/ansible-tmp-1461173013.93-9076457629738/ping'"'"''
+--- origsrc/ansible-2.7.6/lib/ansible/plugins/connection/ssh.py	2019-01-17 12:39:43.000000000 -0600
++++ src/ansible-2.7.6/lib/ansible/plugins/connection/ssh.py	2019-01-27 22:15:19.805898500 -0600
+@@ -49,7 +49,7 @@ DOCUMENTATION = '''
+               - name: ansible_ssh_pass
+       ssh_args:
+           description: Arguments to pass to all ssh cli tools
+-          default: '-C -o ControlMaster=auto -o ControlPersist=60s'
++          default: '-C -o ControlMaster=no -o ControlPersist=60s'
+           ini:
+               - section: 'ssh_connection'
+                 key: 'ssh_args'
+--- origsrc/ansible-2.7.6/test/integration/targets/delegate_to/runme.sh	2019-01-17 12:39:43.000000000 -0600
++++ src/ansible-2.7.6/test/integration/targets/delegate_to/runme.sh	2019-01-27 22:15:28.180898500 -0600
+@@ -2,7 +2,7 @@
+ 
+ set -eux
+ 
+-ANSIBLE_SSH_ARGS='-C -o ControlMaster=auto -o ControlPersist=60s -o UserKnownHostsFile=/dev/null' \
++ANSIBLE_SSH_ARGS='-C -o ControlMaster=no -o ControlPersist=60s -o UserKnownHostsFile=/dev/null' \
+     ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook test_delegate_to.yml -i inventory -v "$@"
+ 
+ ansible-playbook test_loop_control.yml -v "$@"
