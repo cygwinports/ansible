@@ -17,7 +17,7 @@ ARCH=noarch
 DIFF_EXCLUDES="build dist docs .pytest_cache results"
 
 PKG_NAMES="${NAME} ${NAME}-doc"
-ansible_REQUIRES="python3-cryptography python3-jmespath python3-paramiko python3-passlib sshpass"
+ansible_REQUIRES="python37-cryptography python37-jmespath python37-paramiko python37-passlib sshpass"
 ansible_CONTENTS="
 	--exclude=html
 	etc/defaults/etc/ansible/
@@ -30,7 +30,7 @@ ansible_CONTENTS="
 ansible_doc_CATEGORY="Doc"
 ansible_doc_CONTENTS="usr/share/doc/${NAME}/html"
 # pycrypto is NOT required at runtime when cryptography is present
-BUILD_REQUIRES="${REQUIRES} python3-crypto python3-alabaster python3-sphinx"
+BUILD_REQUIRES="${REQUIRES} python37-crypto python37-alabaster python37-sphinx"
 
 REQUIRES_EXCLUDE_FROM="*/ansible/modules/*/*.py:*/ansible/modules/*/*/*.py"
 
