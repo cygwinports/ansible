@@ -1,7 +1,7 @@
 inherit python3-wheel
 
 NAME="ansible"
-VERSION=2.7.9
+VERSION=2.8.2
 RELEASE=1
 CATEGORY="Admin"
 SUMMARY="System automation tool"
@@ -17,7 +17,8 @@ ARCH=noarch
 DIFF_EXCLUDES="build dist docs .pytest_cache results"
 
 PKG_NAMES="${NAME} ${NAME}-doc"
-ansible_REQUIRES="python37-cryptography python37-jmespath python37-paramiko python37-passlib sshpass"
+# TODO: python37-paramiko
+ansible_REQUIRES="python37-certifi python37-cryptography python37-jmespath python37-passlib python37-pypsrp python37-winrm openssh sshpass"
 ansible_CONTENTS="
 	--exclude=html
 	etc/defaults/etc/ansible/
@@ -30,7 +31,7 @@ ansible_CONTENTS="
 ansible_doc_CATEGORY="Doc"
 ansible_doc_CONTENTS="usr/share/doc/${NAME}/html"
 # pycrypto is NOT required at runtime when cryptography is present
-BUILD_REQUIRES="${REQUIRES} python37-crypto python37-alabaster python37-sphinx"
+BUILD_REQUIRES="${REQUIRES} python37-crypto python37-alabaster python37-sphinx python37-sphinx-notfound-page"
 
 REQUIRES_EXCLUDE_FROM="*/ansible/modules/*/*.py:*/ansible/modules/*/*/*.py"
 
